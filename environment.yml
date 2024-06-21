@@ -1,0 +1,12 @@
+name: aweber
+channels:
+  - conda-forge
+  - defaults
+dependencies:
+  - requests
+  - requests-oauthlib
+  - ipykernel
+  - pandas
+  - sqlalchemy
+  - psycopg2
+prefix: /opt/anaconda3/envs/aweber
