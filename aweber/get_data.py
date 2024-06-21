@@ -1,4 +1,4 @@
-# %%
+#!/usr/bin/env python3
 import os
 os.environ['OAUTHLIB_INSECURE_TRANSPORT'] = '1'
 
