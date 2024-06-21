@@ -5,5 +5,5 @@ cd aweber
 pip freeze > requirements.txt
 git add .
 git commit -m "update requirements"
-git push origin master
+git push origin main
 
