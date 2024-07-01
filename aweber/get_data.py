@@ -19,14 +19,16 @@ import time
 
 
 # %%
-creds_path="./"
+
 test=0
 if test==1:
     limit_per_request=1
     sleep_time_for_one_campaign=0
+    creds_path="./"
 else:
     limit_per_request=30
     sleep_time_for_one_campaign=0.6
+    creds_path="/home/deploy/python/aweber/"
 
 # %%
 
@@ -54,7 +56,7 @@ token_url = 'https://auth.aweber.com/oauth2/token'
 scopes = ['email.read', 'account.read', 'list.read', 'subscriber.read']
 
 # File to store tokens
-token_file = 'aweber_tokens.json'
+token_file = creds_path+'aweber_tokens.json'
 
 def save_tokens(tokens):
     with open(token_file, 'w') as f:
