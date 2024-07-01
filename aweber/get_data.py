@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+# %%
 import os
 os.environ['OAUTHLIB_INSECURE_TRANSPORT'] = '1'
 
@@ -19,8 +19,9 @@ import time
 
 
 # %%
-
+creds_path="./"
 test=0
+#test=1
 if test==1:
     limit_per_request=1
     sleep_time_for_one_campaign=0
@@ -260,12 +261,12 @@ if __name__ == "__main__":
 # Function to extract the specific part from the body_text
 def extract_cosmic_slot(body_text):
     print(body_text)
-    pattern = r'-email-([^-]*)-([^-]*)-([^-]*)-'
+    pattern = r'-email-([^-]*)-([^-]*)-([^-]*)-([^-]*)-([a-zA-Z_]*)'
     match = re.search(pattern, body_text)
     #string = '-email-nl-xxxxxxxxxxxxxxxx-justbit-'
     if match:
-        return match.group(1), match.group(3)
-    return None, None
+        return match.group(1), match.group(3), (match.group(5)=='trickyspins_email_welcome')
+    return None, None, None
 
 def get_campaign_characteristics(account_id, list_id, campaign_id, campaign_type, access_token):
     try:
@@ -280,10 +281,11 @@ def get_campaign_characteristics(account_id, list_id, campaign_id, campaign_type
         response = requests.get(campaign_details_url, headers=headers)
         response.raise_for_status()
         json_data = response.json()
-        country_code, brand_name=extract_cosmic_slot(json_data['body_text'])
+        country_code, brand_name, is_welcome_campaign=extract_cosmic_slot(json_data['body_text'])
         extracted_data = {
             'brand_name': brand_name,
             'country_code': country_code,
+            'is_welcome_campaign': is_welcome_campaign,
             'sent_at': json_data['sent_at'],
             'sent_at_cet': convert_to_cet(json_data['sent_at']), # Convert to CET timezone
             'broadcast_id': json_data['broadcast_id'],
@@ -314,16 +316,22 @@ list_id = 6405738  # Replace with actual list ID
 campaign_characteristics, lists = fetch_all_campaigns(account_id, campaign_type_set='b', data_nature='campaigns_characteristics')
 
 
-
-
+string="email-202301010000-undefined-undefined-0-email-de-xxxxxxxxxxxxxxxx-cobra-undefined-trickyspins_email"
+#extract_cosmic_slot(string)
 #print(campaign_characteristics)
 
 # %%
-#campaign_characteristics[5]
+
+
+# string="202301010000-undefined-undefined-0-email-de-xxxxxxxxxxxxxxxx-cobra-undefined-trickyspins_email_welcome"
+# extract_cosmic_slot(string)
 
 # %%
 if __name__ == "__main__":
     load_data_to_db(json_vector=campaign_characteristics, schema='danila', table='stg_aweber__campaign_characteristics')
+
+# %%
+
 
 # %%
 
