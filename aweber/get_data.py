@@ -327,8 +327,8 @@ string="email-202301010000-undefined-undefined-0-email-de-xxxxxxxxxxxxxxxx-cobra
 # extract_cosmic_slot(string)
 
 # %%
-if __name__ == "__main__":
-    load_data_to_db(json_vector=campaign_characteristics, schema='danila', table='stg_aweber__campaign_characteristics')
+#if __name__ == "__main__":
+load_data_to_db(json_vector=campaign_characteristics, schema='danila', table='stg_aweber__campaign_characteristics')
 
 # %%
 
