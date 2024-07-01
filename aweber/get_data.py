@@ -230,7 +230,7 @@ all_campaigns_details_final, lists = fetch_all_campaigns(account_id, campaign_ty
 # sql_credentials['string']
 
 # %%
-from sqlalchemy import create_engine
+from sqlalchemy import create_engine, inspect, text
 #import pandas as pd
 
 sql_creds = creds_path+'postgres_credentials.json'
@@ -238,6 +238,23 @@ sql_creds = creds_path+'postgres_credentials.json'
 # Load the credentials
 with open(sql_creds, 'r') as file:
     sql_credentials = json.load(file)
+
+def update_schema(schema, table, engine, df):
+    # Inspect the existing table schema
+    inspector = inspect(engine)
+    existing_columns = [col['name'] for col in inspector.get_columns(table, schema=schema)]
+
+    # Find new columns to add
+    new_columns = set(df.columns) - set(existing_columns)
+    
+    # Add new columns to the table
+    if new_columns:
+        with engine.connect() as conn:
+            for col in new_columns:
+                col_type = pd.io.sql.get_sqltype(df[col].dtype, engine)
+                add_column_sql = text(f'ALTER TABLE {schema}.{table} ADD COLUMN {col} {col_type}')
+                conn.execute(add_column_sql)
+
 
 def load_data_to_db(json_vector=all_campaigns_details_final, schema='danila', table='stg_aweber__campaign_data'):
     engine = create_engine(sql_credentials['string'])
@@ -248,11 +265,14 @@ def load_data_to_db(json_vector=all_campaigns_details_final, schema='danila', ta
     # Add current timestamp in CET timezone
     df['updated_at_cet'] = datetime.now(cet)
 
+    # Update schema if needed
+    update_schema(schema, table, engine, df)
+
     # Load data into the specified schema in the database
     df.to_sql(table, engine, if_exists='replace', index=False, schema='danila')
 
-if __name__ == "__main__":
-    load_data_to_db()
+#if __name__ == "__main__":
+load_data_to_db()
 
 # %% [markdown]
 # # Getting campaign country and brand
